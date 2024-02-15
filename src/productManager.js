@@ -7,7 +7,8 @@ class ProductManager {
   }
 
   generateProductId() {
-    return `_${Date.now().toString(36)}_${Math.random().toString(36).substr(2, 9)}`;
+    const nextId = this.products.length + 1;
+    return nextId.toString();
   }
 
   getProducts() {
@@ -98,40 +99,4 @@ class ProductManager {
   }
 }
 
-// Uso del ProductManager
-const productManager = new ProductManager('products.json');
-
-// Cargar productos desde el archivo (si existe)
-productManager.loadProductsFromFile();
-
-console.log(productManager.getProducts());
-
-const newProduct = productManager.addProduct("producto prueba", "Este es un producto prueba", 200, "Sin imagen", "abc123", 25);
-console.log(productManager.getProducts());
-
-// Guardar productos en el archivo
-productManager.saveProductsToFile();
-
-try {
-  productManager.addProduct("producto prueba", "Este es un producto prueba", 300, "Sin imagen", "abc123", 25);
-} catch (error) {
-  console.error(error.message);
-}
-
-const retrievedProduct = productManager.getProductById(newProduct.id);
-console.log(retrievedProduct);
-
-// Producto que no existe lanza error
-try {
-  productManager.getProductById('nonExistentId');
-} catch (error) {
-  console.error(error.message);
-}
-
-const updatedProduct = productManager.updateProduct(newProduct.id, {
-  title: 'Producto Actualizado',
-  price: 250,
-  stock: 30,
-});
-
-console.log(updatedProduct, 'el producto fue modificado!');
+module.exports = ProductManager;
