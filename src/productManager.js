@@ -17,8 +17,7 @@ class ProductManager {
 
   addProduct(title, description, price, thumbnail, code, stock) {
     // Verifica si el código ya está en uso
-    const isCodeUnique = this.products.some(product => product.code === code);
-
+    const isCodeUnique = this.products.every(product => product.code !== code);
 
     if (!isCodeUnique) {
       throw new Error('Error: El código del producto ya está en uso.');
