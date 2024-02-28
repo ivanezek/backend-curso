@@ -15,7 +15,7 @@ class ProductManager {
     return this.products;
   }
 
-  addProduct(title, description, price, thumbnail, code, stock) {
+  addProduct(title, description, price, status, category, thumbnail, code, stock) {
     // Verifica si el código ya está en uso
     const isCodeUnique = this.products.every(product => product.code !== code);
 
@@ -29,6 +29,8 @@ class ProductManager {
       title,
       description,
       price,
+      status,
+      category,
       thumbnail,
       code,
       stock,
