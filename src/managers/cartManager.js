@@ -34,6 +34,11 @@ class CartManager {
     // Devolver el producto agregado o actualizado
     return cart.products.find(product => product.id === productId);
 }
+
+getAllCarts() {
+  return this.carts
+}
+
   generateCartId() {
     return Date.now().toString(); 
   }
