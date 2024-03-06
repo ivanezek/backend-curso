@@ -1,0 +1,19 @@
+<h1>Lista de productos WEBSOCKET</h1>
+<ul>
+    {{#each products}}
+    <li>{{this.title}} - {{this.description}} - $ {{this.price}} </li>
+    {{/each}}
+
+</ul>
+
+<a href="/">Volver a la Home</a>
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+
+    socket.on('products', (products) => {
+        console.log('Productos en tiempo real:', products);
+    });
+</script>
