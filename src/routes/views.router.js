@@ -1,20 +1,29 @@
 const Router = require('express').Router;
-const path = require('path');
 const socketIO = require('socket.io');
 const ProductManager = require("../managers/productManager")
 const viewsRouter = Router();
 
-const productManager = new ProductManager(path.join(__dirname, '../data/products.json'));
+const productManager = new ProductManager()
 
-productManager.loadProductsFromFile();
 
-viewsRouter.get('/', (req, res) => {
-  res.status(200).render('home', { products: productManager.getProducts() });
+function handleRealTimeProductsSocket(io) {
+  io.on('connection', async(socket) => {
+      console.log('Usuario conectado a la ruta /realtimeproducts');
+      const products = await productManager.getProducts();
+      socket.emit('products', products);
+  });
+}
+
+
+viewsRouter.get('/', async(req, res) => {
+  const products = await productManager.getProducts();
+  res.status(200).render('home', { products });
 });
 
 
-viewsRouter.get('/realtimeproducts', (req, res) => {
-    res.status(200).render('realtimeproducts', { products: productManager.getProducts() });
+viewsRouter.get('/realtimeproducts', async(req, res) => {
+    const products = await productManager.getProducts();
+    res.status(200).render('realtimeproducts', { products });
   });
 
-module.exports = viewsRouter
+  module.exports = { viewsRouter, handleRealTimeProductsSocket };
