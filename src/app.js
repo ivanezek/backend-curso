@@ -18,7 +18,12 @@ app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 app.use(express.static(path.join(__dirname, "public")))
 
-app.engine("handlebars", handlebars.engine())
+app.engine("handlebars", handlebars.engine({
+    runtimeOptions: {
+        allowProtoPropertiesByDefault: true,
+        allowProtoMethodsByDefault: true,
+    },
+}))
 app.set("view engine", "handlebars")
 app.set("views", path.join(__dirname, "views"))
 

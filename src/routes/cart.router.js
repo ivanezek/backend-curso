@@ -1,58 +1,59 @@
 const Router = require('express').Router;
 const CartManager = require("../managers/cartManager") 
-const path = require('path')
-
 const cartRouter=Router()
-const rutaProductos = path.join(__dirname, '../../src/data/carts.json');
+
+const cartManager = new CartManager();
 
 
-const cartManager = new CartManager(rutaProductos);
-
-
-cartRouter.get('/', (req, res) => {
-    cartManager.loadCartsFromFile();
-    const limit = req.query.limit ? parseInt(req.query.limit) : 10;
-    const carts = cartManager.getAllCarts().slice(0, limit);
-    res.json(carts);
+cartRouter.get('/', async (req, res) => {
+    try {
+        const carts = await cartManager.getAllCarts();
+        res.json(carts);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
 // Ruta POST para crear un nuevo carrito
-cartRouter.post('/', (req, res) => {
+cartRouter.post('/', async (req, res) => {
     const initialProducts = req.body.products || []; // Puedes enviar un array de productos en el cuerpo de la solicitud si es necesario
-    const newCart = cartManager.createCart(initialProducts);
-    res.status(201).json(newCart);
-});
-
-// RUTA GET PARA CONSEGUIR EL CARRITO POR ID 
-cartRouter.get('/:id', (req, res) => {
-    const cartId = req.params.id;
-
     try {
-        const cart = cartManager.getCartById(cartId);
-        
-        if (!cart) {
-            res.status(404).json({ error: 'Carrito no encontrado' });
-            return;
-        }
-
-        res.json(cart.products);
+        const newCart = await cartManager.createCart(initialProducts);
+        res.status(201).json(newCart);
     } catch (error) {
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
 
-cartRouter.post('/:id/product/:productId', (req, res) => {
+// RUTA GET PARA CONSEGUIR EL CARRITO POR ID 
+cartRouter.get('/:id', async (req, res) => {
     const cartId = req.params.id;
-    const productId = req.params.productId;
+    try {
+        const cart = await cartManager.getCartById(cartId);
+        if (!cart) {
+            res.status(404).json({ error: 'Carrito no encontrado' });
+            return;
+        }
+        res.json(cart);
+    } catch (error) {
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+
+cartRouter.post('/:id/products', async (req, res) => {
+    const cartId = req.params.id;
+    const productId = req.body.productId; // El ID del producto a agregar se espera en el cuerpo de la solicitud
 
     try {
-        const addedProduct = cartManager.addProductToCart(cartId, productId);
+        const addedProduct = await cartManager.addProductToCart(cartId, productId);
         res.status(201).json(addedProduct);
     } catch (error) {
         res.status(404).json({ error: error.message });
     }
 });
+
 
 
 module.exports = cartRouter;
