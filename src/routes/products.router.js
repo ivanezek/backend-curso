@@ -1,5 +1,6 @@
 const Router = require('express').Router;
-const ProductManager = require("../managers/productManager") 
+const ProductManager = require("../managers/productManager")
+const { modeloProductos } = require('../dao/models/productos.modelo'); 
 const productRouter=Router()
 
 const productManager = new ProductManager()
@@ -7,8 +8,12 @@ const productManager = new ProductManager()
 // METODO GET PARA OBTENER LOS PRODUCTOS
 productRouter.get('/', async (req, res) => {
     try {
-        const limit = req.query.limit ? parseInt(req.query.limit) : 10; // Obtener el valor de limit de los parámetros de consulta
-        const products = await productManager.getProducts(limit); // Llamar al método getProducts con el límite especificado
+        const { page = 1, limit = 2 } = req.query;
+        const options = {
+            page: parseInt(page),
+            limit: parseInt(limit)
+        };
+        const products = await modeloProductos.paginate({}, options);
         res.json(products);
     } catch (error) {
         res.status(500).json({ error: error.message });

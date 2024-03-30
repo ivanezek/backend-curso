@@ -5,7 +5,7 @@ const { modeloProductos } = require('../dao/models/productos.modelo');
   }
 
 
-  async getProducts(limit = 10) {
+  async getProducts(limit = 2) {
     try {
       const products = await modeloProductos.find().limit(limit);
       return products;
