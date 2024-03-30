@@ -47,10 +47,7 @@ server.listen(PORT, () => {
 
 const connect = async()=>{
     try{
-        await mongoose.connect("mongodb+srv://ivanrosales:cursoCoder@backend-db.g9wu9xl.mongodb.net/?retryWrites=true&w=majority&appName=backend-db&dbName=curso-coderhouse",{
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        })
+        await mongoose.connect("mongodb+srv://ivanrosales:cursoCoder@backend-db.g9wu9xl.mongodb.net/?retryWrites=true&w=majority&appName=backend-db&dbName=curso-coderhouse")
         console.log("Conectado a MongoDB")
     }catch(error){
         console.error("Error al conectar a MongoDB", error)

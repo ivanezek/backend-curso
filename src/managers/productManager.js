@@ -5,9 +5,9 @@ const { modeloProductos } = require('../dao/models/productos.modelo');
   }
 
 
-  async getProducts() {
+  async getProducts(limit = 10) {
     try {
-      const products = await modeloProductos.find();
+      const products = await modeloProductos.find().limit(limit);
       return products;
     } catch (error) {
       throw new Error('Error al obtener los productos desde MongoDB: ' + error.message);

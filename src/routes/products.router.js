@@ -7,10 +7,11 @@ const productManager = new ProductManager()
 // METODO GET PARA OBTENER LOS PRODUCTOS
 productRouter.get('/', async (req, res) => {
     try {
-        const products = await productManager.getProducts();
+        const limit = req.query.limit ? parseInt(req.query.limit) : 10; // Obtener el valor de limit de los parámetros de consulta
+        const products = await productManager.getProducts(limit); // Llamar al método getProducts con el límite especificado
         res.json(products);
     } catch (error) {
-        res.status(500).json({ error: 'Error al obtener los productos' });
+        res.status(500).json({ error: error.message });
     }
 });
 
