@@ -59,6 +59,40 @@ cartRouter.post('/:id/products', async (req, res) => {
     }
 });
 
+// Ruta DELETE para eliminar un producto del carrito
+
+cartRouter.delete('/:cartId/products/:productId', async (req, res) => {
+    const { cartId, productId } = req.params;
+    try {
+        await cartManager.removeProductFromCart(cartId, productId);
+        res.json({ message: 'Producto eliminado del carrito exitosamente' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al eliminar el producto del carrito: ' + error.message });
+    }
+});
+
+cartRouter.put('/:cartId/products/:productId', async (req, res) => {
+    const { cartId, productId } = req.params;
+    const { quantity } = req.body;
+
+    try {
+        await cartManager.updateProductQuantity(cartId, productId, quantity);
+        res.json({ message: 'Cantidad del producto actualizada exitosamente en el carrito' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al actualizar la cantidad del producto en el carrito: ' + error.message });
+    }
+});
+
+cartRouter.delete('/:cartId', async (req, res) => {
+    const { cartId } = req.params;
+    try {
+        await cartManager.removeAllProductsFromCart(cartId);
+        res.json({ message: 'Todos los productos han sido eliminados del carrito exitosamente' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al eliminar todos los productos del carrito: ' + error.message });
+    }
+});
+
 
 
 module.exports = cartRouter;

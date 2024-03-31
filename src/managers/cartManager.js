@@ -64,6 +64,66 @@ class CartManager {
     }
   }
 
+  async removeProductFromCart(cartId, productId) {
+    try {
+        const cart = await modeloCarts.findById(cartId);
+
+        if (!cart) {
+            throw new Error(`Carrito no encontrado para el ID ${cartId}`);
+        }
+
+        cart.products = cart.products.filter(product => !product.productId.equals(productId));
+        await cart.save();
+
+        return cart;
+    } catch (error) {
+        throw new Error('Error al eliminar el producto del carrito: ' + error.message);
+    }
+}
+
+async updateProductQuantity(cartId, productId, newQuantity) {
+    try {
+        
+        const cart = await modeloCarts.findById(cartId);
+
+        if (!cart) {
+            throw new Error(`Carrito no encontrado para el ID ${cartId}`);
+        }
+        
+        const productToUpdate = cart.products.find(product => product.productId.equals(productId));
+
+        if (!productToUpdate) {
+            throw new Error(`Producto no encontrado en el carrito`);
+        }
+        
+        productToUpdate.quantity = newQuantity;
+
+        await cart.save();
+
+        return cart;
+    } catch (error) {
+        throw new Error('Error al actualizar la cantidad del producto en el carrito: ' + error.message);
+    }
+}
+
+async removeAllProductsFromCart(cartId) {
+    try {
+        const cart = await modeloCarts.findById(cartId);
+
+        if (!cart) {
+            throw new Error(`Carrito no encontrado para el ID ${cartId}`);
+        }
+
+        cart.products = [];
+
+        await cart.save();
+
+        return cart;
+    } catch (error) {
+        throw new Error('Error al eliminar todos los productos del carrito: ' + error.message);
+    }
+}
+
 }
 
 module.exports = CartManager;
