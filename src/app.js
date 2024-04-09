@@ -6,7 +6,9 @@ const handlebars = require("express-handlebars")
 const productRouter = require("./routes/products.router")
 const cartRouter = require("./routes/cart.router")
 const {viewsRouter, handleRealTimeProductsSocket} = require("./routes/views.router");
+const sessionsRouter = require("./routes/sessions.router")
 const socketIO = require("socket.io");
+const session = require("express-session");
 
 const PORT = 8080;
 const app = express();
@@ -16,6 +18,11 @@ const io = socketIO(server);
 
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
+app.use(session({
+    secret: "secreto",
+    resave: true,
+    saveUninitialized: true
+}))
 app.use(express.static(path.join(__dirname, "public")))
 
 app.engine("handlebars", handlebars.engine({
@@ -30,6 +37,7 @@ app.set("views", path.join(__dirname, "views"))
 //RUTAS
 app.use("/", viewsRouter)
 app.use("/api/products", productRouter)
+app.use("/api/sessions", sessionsRouter)
 app.use("/api/carts", cartRouter)
 
 handleRealTimeProductsSocket(io);
