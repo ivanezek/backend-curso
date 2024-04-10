@@ -1,13 +1,15 @@
 <h1>Lista de productos</h1>
+{{#if welcomeMessage}}
+    <p>{{welcomeMessage}}</p>
+{{/if}}
+
 <ul>
     {{#each products}}
     <li>{{this.title}} - {{description}} - $ {{price}} </li>
     {{/each}}
 </ul>
 
-<a href="/realtimeproducts">Ir a realtimeproducts</a>
-<a href="/">Volver a la home</a>
-<hr>
+{{>menu}}
 
 {{#if hasPrevPage}}
     <a href="/products?pagina={{prevPage}}">Pag.Ant.</a>

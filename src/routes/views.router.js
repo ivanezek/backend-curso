@@ -4,6 +4,10 @@ const ProductManager = require("../managers/productManager")
 const viewsRouter = Router();
 const { modeloProductos } = require('../dao/models/productos.modelo'); 
 const { modeloCarts } = require('../dao/models/carts.modelo');
+const UserManager = require('../managers/userManager');
+
+let userManager = new UserManager();
+
 
 
 const productManager = new ProductManager()
@@ -23,24 +27,44 @@ viewsRouter.get('/', async(req, res) => {
 });
 
 viewsRouter.get('/products', async(req, res) => {
-  let {pagina}=req.query
-  if(!pagina){
-      pagina=1
-  }
+    let { pagina } = req.query;
+    if (!pagina) {
+        pagina = 1;
+    }
 
-  let {
-      docs:products,
-      totalPages, 
-      prevPage, nextPage, 
-      hasPrevPage, hasNextPage
-  } = await modeloProductos.paginate({},{limit:2, page:pagina, lean:true})
+    let {
+        docs: products,
+        totalPages,
+        prevPage,
+        nextPage,
+        hasPrevPage,
+        hasNextPage
+    } = await modeloProductos.paginate({}, { limit: 2, page: pagina, lean: true });
 
-  res.status(200).render('products', { products, totalPages, 
-    prevPage, nextPage, 
-    hasPrevPage, hasNextPage });
+    let welcomeMessage = "";
+    if (req.session.user) {
+        try {
+            const user = await userManager.getUserByFilter({ username: req.session.user.username });
+            if (user.role === 'admin') {
+                welcomeMessage = `Bienvenido, ${user.username}. Eres un administrador.`;
+            } else {
+                welcomeMessage = `Bienvenido, ${user.username}.`;
+            }
+        } catch (error) {
+            console.error('Error al obtener información del usuario:', error);
+        }
+    }
+
+    res.status(200).render('products', {
+        products,
+        totalPages,
+        prevPage,
+        nextPage,
+        hasPrevPage,
+        hasNextPage,
+        welcomeMessage 
+    });
 });
-
-
 // Ruta para mostrar los detalles de un producto
 viewsRouter.get('/products/:id', async (req, res) => {
   try {
@@ -84,7 +108,18 @@ viewsRouter.get('/cart/:id', async (req, res) => {
   }
 });
 
+// VISTA LOGIN
+viewsRouter.get('/login', async(req, res) => {
+    let {message, error} = req.query;
+  res.status(200).render('login', {message, error});
+});
 
+// VISTA Register
+viewsRouter.get('/register', async(req, res) => {
+
+    let {message, error} = req.query;
+  res.status(200).render('register', {message, error});
+});
 
 
 viewsRouter.get('/realtimeproducts', async(req, res) => {
