@@ -14,6 +14,7 @@ sessionRouter.get('/', async (req, res) => {
     }
 });
 
+// REGISTER
 sessionRouter.post('/register', async (req, res) => {
 
     const { username, email, password, role } = req.body;
@@ -38,33 +39,45 @@ sessionRouter.post('/register', async (req, res) => {
     }
 });
 
-
+// login
 sessionRouter.post('/login', async (req, res) => {
     const { username, password } = req.body;
     if (!username || !password) {
-        return res.redirect("/login?error=missingFields");
+        if (req.headers['content-type'] === 'application/json') {
+            return res.status(400).json({ error: 'Missing fields' });
+        } else {
+            return res.redirect("/login?error=missingFields");
+        }
     }
+
     try {
-        const user = await userManager.getUserByFilter({ username, password });
-        if (user) {
-            req.session.user = user;
-            console.log('Usuario logueado', user);
-            res.status(200).json({ message: 'Usuario logueado' });
+        const user = await userManager.authenticateUser(username, password);
+        req.session.user = user;
+        if (req.headers['content-type'] === 'application/json') {
+            return res.status(200).json({ message: 'Login successful' });
+        } else {
+            return res.redirect("/products");
         }
     } catch (error) {
-        console.error('Error al loguear usuario:', error);
-        res.status(500).json({ error: 'Error al loguear usuario.' });
+        if (req.headers['content-type'] === 'application/json') {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        } else {
+            return res.redirect("/login?error=invalidCredentials");
+        }
     }
 });
+
+// LOGOUT
 sessionRouter.get('/logout', async (req, res) => {
     req.session.destroy(err => {
         if (err) {
             console.error('Error al cerrar sesión:', err);
             res.status(500).send('Error al cerrar sesión.');
         } else {
-            res.redirect('/login'); // Redirigir a la página de inicio de sesión
+            res.redirect('/login'); 
         }
     });
 });
+
 
 module.exports = sessionRouter;
