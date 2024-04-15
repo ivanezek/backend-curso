@@ -65,6 +65,9 @@ viewsRouter.get('/products', async(req, res) => {
         welcomeMessage 
     });
 });
+
+
+
 // Ruta para mostrar los detalles de un producto
 viewsRouter.get('/products/:id', async (req, res) => {
   try {
@@ -121,6 +124,13 @@ viewsRouter.get('/register', async(req, res) => {
   res.status(200).render('register', {message, error});
 });
 
+// PROFILE PAGE VIEW
+viewsRouter.get('/profile', async (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
+    res.render('profile', { user: req.session.user });
+  });
 
 viewsRouter.get('/realtimeproducts', async(req, res) => {
     const products = await productManager.getProducts();
