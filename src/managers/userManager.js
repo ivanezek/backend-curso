@@ -1,4 +1,5 @@
 const { userModel } = require("../dao/models/users.modelo");
+const bcrypt = require('bcrypt');
 
 class UserManager {
 
@@ -13,10 +14,11 @@ class UserManager {
 
     async addUser(username, email, password, role) {
         try {
+            const hashedPassword = await bcrypt.hash(password, 10); 
             const newUser = await userModel.create({
                 username: username,
                 email: email,
-                password: password,
+                password: hashedPassword,
                 role: role
             });
             return newUser;
@@ -31,7 +33,8 @@ class UserManager {
             if (!user) {
                 throw new Error('Usuario no encontrado.');
             }
-            if (user.password !== password) {
+            const isPasswordCorrect = await bcrypt.compare(password, user.password);
+            if (!isPasswordCorrect) {
                 throw new Error('Contraseña incorrecta.');
             }
             return user;
