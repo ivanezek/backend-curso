@@ -9,6 +9,8 @@ const {viewsRouter, handleRealTimeProductsSocket} = require("./routes/views.rout
 const sessionsRouter = require("./routes/sessions.router")
 const socketIO = require("socket.io");
 const session = require("express-session");
+const passport = require("passport");
+const passportConfig = require("./config/passport.config");
 
 const PORT = 8080;
 const app = express();
@@ -23,6 +25,11 @@ app.use(session({
     resave: true,
     saveUninitialized: true
 }))
+
+// inicializacion de passport
+passportConfig()
+app.use(passport.initialize())
+app.use(passport.session())
 app.use(express.static(path.join(__dirname, "public")))
 
 app.engine("handlebars", handlebars.engine({
