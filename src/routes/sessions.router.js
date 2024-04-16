@@ -18,15 +18,40 @@ sessionRouter.get('/', async (req, res) => {
 
 // REGISTER
 
-sessionRouter.get('/registerError', async (req, res) => {
-    return res.redirect("/register?message=registerError");
-});
-
-sessionRouter.post('/register', passport.authenticate('register', {failureRedirect:"/api/sessions/registerError"}), async (req, res) => {
-    console.log('Usuario registrado', req.user);
-    return res.redirect("/register?message=registerSuccess");
-});
-
+// Registro
+sessionRouter.get("/registerError", (req, res) => {
+    res.redirect("/register?message=Error en registro");
+  });
+  
+  sessionRouter.post(
+    "/register",
+    passport.authenticate("register", {
+      failureRedirect: "/api/sessions/registerError",
+    }),
+    async (req, res) => {
+      return res.redirect("/register?message=¡Registro correcto!");
+    }
+  );
+  
+  // Login normal
+  sessionRouter.get("/loginError", (req, res) => {
+    res.redirect("/login?error=Error en login");
+  });
+  
+  sessionRouter.post(
+    "/login",
+    passport.authenticate("login", {
+      failureRedirect: "/api/sessions/loginError",
+    }),
+    async (req, res) => {
+      let usuario = req.user; // Obtenemos el usuario del middleware de Passport
+      usuario = { ...usuario };
+      delete usuario.password;
+      req.session.usuario = usuario;
+      res.setHeader("Content-Type", "application/json");
+      return res.redirect("/products");
+    }
+  );
 // sessionRouter.post('/register', async (req, res) => {
 
 //     const { username, email, password, role } = req.body;
@@ -53,14 +78,7 @@ sessionRouter.post('/register', passport.authenticate('register', {failureRedire
 
 // login
 
-sessionRouter.get('/loginError', async (req, res) => {
-    return res.redirect("/login?error=loginError");
-});
 
-sessionRouter.post('/login', passport.authenticate('login', {failureRedirect:"/api/sessions/loginError"}), async (req, res) => {
-    console.log('Usuario logueado', req.user);
-    res.status(200).json({ message: 'Login successful' });
-});
 
 // sessionRouter.post('/login', async (req, res) => {
 //     const { username, password } = req.body;

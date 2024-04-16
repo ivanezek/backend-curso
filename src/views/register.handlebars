@@ -1,4 +1,16 @@
 <h2>Register:</h2>
+
+<div id="mensaje">
+        {{#if error}}
+        <div style="font-weight: bold; color:red;">{{error}}</div>
+    {{/if}}
+
+    {{#if message}}
+        <div style="font-weight: bold; color:green;">{{message}}</div>
+    {{/if}}
+
+</div>
+
 <form action="/api/sessions/register" method="post">
     <input type="text" name="username" placeholder="nombre">
     <input type="email" name="email" placeholder="email">
