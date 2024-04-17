@@ -1,5 +1,5 @@
 const passport = require('passport');
-const local = require('passport-local').Strategy;
+const local = require('passport-local');
 const github = require('passport-github2').Strategy;
 const UserManager = require('../managers/userManager');
 const { userModel } = require("../dao/models/users.modelo");
@@ -10,35 +10,35 @@ const userManager = new UserManager();
 // REGISTER PASSPORT
 
 const passportConfig = () => {
-    passport.use(
-        "register",
-        new local.Strategy(
-          {
-            usernameField: "email",
-            passReqToCallback: true,
-          },
-          async function (req, email, password, done) {
-            try {
-              const { username, role } = req.body;
-    
-              if (!username || !email || !password) {
-                return done(null, false, { message: "Username, email, and password are required" });
-              }
-    
-              const userExists = await userManager.getUserByFilter({ email });
-              if (userExists) {
-                return done(null, false, { message: "User already exists" });
-              }
-    
-              const hashedPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
-              const newUser = await userManager.addUser(username, email, hashedPassword, role);
-              return done(null, newUser);
-            } catch (error) {
-              return done(error);
-            }
+  passport.use(
+    "register",
+    new local.Strategy(
+      {
+        usernameField: "email",
+        passReqToCallback: true,
+      },
+      async function (req, email, password, done) {
+        try {
+          const { username, role } = req.body;
+
+          if (!username || !email || !password) {
+            return done(null, false, { message: "Username, email, and password are required" });
           }
-        )
-      );
+
+          const userExists = await userManager.getUserByFilter({ email });
+          if (userExists) {
+            return done(null, false, { message: "User already exists" });
+          }
+
+          const hashedPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+          const newUser = await userManager.addUser(username, email, hashedPassword, role);
+          return done(null, newUser);
+        } catch (error) {
+          return done(error);
+        }
+      }
+    )
+  );
 
       // github
         passport.use(
@@ -77,15 +77,16 @@ const passportConfig = () => {
               console.log({username})
               const user = await userManager.getUserByFilter({email: username });
               if (!user) {
-                return done(null, false, { message: "User not found" });
+                res.setHeader("Content-Type", "application/json");
+                return res.status(401).json({error: "Credenciales incorrectas"});
               }
               
-              const validate = bcrypt.compareSync(password, user.password);
-              console.log('validación de passwords: ', validate)
+              const validatePassword=(user, password)=>bcrypt.compareSync(password, user.password)
+              console.log('validación de passwords: ', validatePassword)
               console.log('password según DB: ', password)
               console.log('password según usuario: ', user.password)
-              if (!validate) {
-                return done(null, false, { message: "Wrong password" });
+              if (!validatePassword) {
+                return done(null, false);
               }
     
               return done(null, user);
@@ -97,16 +98,12 @@ const passportConfig = () => {
       );
     
     passport.serializeUser((user, done) => {
-        done(null, user._id);
+        return done(null, user._id);
     });
     
     passport.deserializeUser(async (id, done) => {
-        try {
             const user = await userManager.getUserByFilter({ _id: id });
-            done(null, user);
-        } catch (error) {
-            done(error);
-        }
+            return done(null, user);
     });
 }
 

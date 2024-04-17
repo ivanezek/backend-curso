@@ -39,7 +39,15 @@ sessionRouter.get("/registerError", (req, res) => {
   });
   
   sessionRouter.post("/login", passport.authenticate("login", {failureRedirect: "/api/sessions/loginError",}), (req, res) => {
-    return res.redirect("/products");
+    let user=req.user
+    user={...user}
+    delete user.password
+    req.session.user =user 
+
+    res.setHeader('Content-Type','application/json')
+    res.status(200).json({
+        message:"Login correcto", user
+    })
   });
 
   // github
