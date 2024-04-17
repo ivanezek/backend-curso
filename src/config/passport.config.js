@@ -51,8 +51,8 @@ const passportConfig = () => {
               },
               async function(accessToken, refreshToken, profile, done){
                 try{
-                  let name = profile._json.name
-                  let email = profile._json.email
+                  let name = profile._json.username;
+                  let email = profile._json.email;
                   let user = await userModel.findOne({email})
                   if(!user){
                     user = await userModel.create({name, email, profileGithub: profile})
@@ -82,9 +82,6 @@ const passportConfig = () => {
               }
               
               const validatePassword=(user, password)=>bcrypt.compareSync(password, user.password)
-              console.log('validación de passwords: ', validatePassword)
-              console.log('password según DB: ', password)
-              console.log('password según usuario: ', user.password)
               if (!validatePassword) {
                 return done(null, false);
               }

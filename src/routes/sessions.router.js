@@ -44,10 +44,7 @@ sessionRouter.get("/registerError", (req, res) => {
     delete user.password
     req.session.user =user 
 
-    res.setHeader('Content-Type','application/json')
-    res.status(200).json({
-        message:"Login correcto", user
-    })
+    res.redirect("/products");
   });
 
   // github
