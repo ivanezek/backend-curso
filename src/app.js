@@ -11,6 +11,7 @@ const socketIO = require("socket.io");
 const session = require("express-session");
 const passport = require("passport");
 const passportConfig = require("./config/passport.config");
+const connectMongo = require("connect-mongo");
 
 const PORT = 8080;
 const app = express();
@@ -23,7 +24,8 @@ app.use(express.urlencoded({extended: true}))
 app.use(session({
     secret: "secreto",
     resave: true,
-    saveUninitialized: true
+    saveUninitialized: true,
+    store: connectMongo.create({mongoUrl: "mongodb+srv://ivanrosales:cursoCoder@backend-db.g9wu9xl.mongodb.net/?retryWrites=true&w=majority&appName=backend-db&dbName=curso-coderhouse"})
 }))
 
 // inicializacion de passport

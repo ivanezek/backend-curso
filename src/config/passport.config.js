@@ -1,6 +1,8 @@
 const passport = require('passport');
 const local = require('passport-local').Strategy;
+const github = require('passport-github2').Strategy;
 const UserManager = require('../managers/userManager');
+const { userModel } = require("../dao/models/users.modelo");
 const bcrypt = require('bcrypt');
 
 const userManager = new UserManager();
@@ -28,7 +30,7 @@ const passportConfig = () => {
                 return done(null, false, { message: "User already exists" });
               }
     
-              const hashedPassword = await bcrypt.hash(password, 10);
+              const hashedPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
               const newUser = await userManager.addUser(username, email, hashedPassword, role);
               return done(null, newUser);
             } catch (error) {
@@ -37,23 +39,48 @@ const passportConfig = () => {
           }
         )
       );
+
+      // github
+        passport.use(
+          "githubLogin",
+            new github(
+              {
+                clientID:"Iv1.29937426a98ebaa3",
+                clientSecret:"325ab9c7ed5dc6535df2d76b1f9590dbd10cf46c",
+                callbackURL:"http://localhost:8080/api/sessions/githubCallback",
+              },
+              async function(accessToken, refreshToken, profile, done){
+                try{
+                  let name = profile._json.name
+                  let email = profile._json.email
+                  let user = await userModel.findOne({email})
+                  if(!user){
+                    user = await userModel.create({name, email, profileGithub: profile})
+                  }
+                }
+                catch(error){
+                  return done(error);
+                }
+              }
+            )
+        )
     
       //  Login
       passport.use(
         "login",
         new local.Strategy(
           {
-            usernameField: "email",
-            passReqToCallback: true,
+            usernameField: "email"
           },
-          async function (req, email, password, done) {
+          async (username, password, done) => {
             try {
-              const user = await userManager.getUserByFilter({ email });
+              console.log({username})
+              const user = await userManager.getUserByFilter({email: username });
               if (!user) {
                 return done(null, false, { message: "User not found" });
               }
               
-              const validate = await bcrypt.compare(password, user.password);
+              const validate = bcrypt.compareSync(password, user.password);
               console.log('validación de passwords: ', validate)
               console.log('password según DB: ', password)
               console.log('password según usuario: ', user.password)

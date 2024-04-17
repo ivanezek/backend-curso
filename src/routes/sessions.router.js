@@ -38,20 +38,31 @@ sessionRouter.get("/registerError", (req, res) => {
     res.redirect("/login?error=Error en login");
   });
   
-  sessionRouter.post(
-    "/login",
-    passport.authenticate("login", {
-      failureRedirect: "/api/sessions/loginError",
-    }),
-    async (req, res) => {
-      let usuario = req.user; // Obtenemos el usuario del middleware de Passport
-      usuario = { ...usuario };
-      delete usuario.password;
-      req.session.usuario = usuario;
-      res.setHeader("Content-Type", "application/json");
-      return res.redirect("/products");
-    }
-  );
+  sessionRouter.post("/login", passport.authenticate("login", {failureRedirect: "/api/sessions/loginError",}), (req, res) => {
+    return res.redirect("/products");
+  });
+
+  // github
+
+  sessionRouter.get("/github", passport.authenticate("githubLogin", {}), (req, res)=>{
+
+  });
+
+  sessionRouter.get("/githubError", (req, res) => {
+   res.setHeader("Content-Type", "application/json");
+   return res.status(500).json({
+    error: "Error en servidor",
+    detalle: "Error en login con Github"
+   })
+  });
+
+  sessionRouter.get("/githubCallback", passport.authenticate("githubLogin", {failureRedirect:"api/sessions/githubError"}), (req, res) => {
+    req.session.user = req.user;
+    res.setHeader("Content-Type", "application/json");
+    return res.status(200).json({payload: "Login successful", user: req.user});
+  });
+
+
 // sessionRouter.post('/register', async (req, res) => {
 
 //     const { username, email, password, role } = req.body;
