@@ -46,7 +46,7 @@ const passportConfig = () => {
             new github(
               {
                 clientID:"info en el data.txt",
-                clientSecret:"325ab9c7ed5dc6535df2d76b1f9590dbd10cf46c",
+                clientSecret:"info en el data.txt",
                 callbackURL:"http://localhost:8080/api/sessions/githubCallback",
               },
               async function(accessToken, refreshToken, profile, done){
