@@ -45,7 +45,7 @@ const passportConfig = () => {
           "githubLogin",
             new github(
               {
-                clientID:"Iv1.29937426a98ebaa3",
+                clientID:"info en el data.txt",
                 clientSecret:"325ab9c7ed5dc6535df2d76b1f9590dbd10cf46c",
                 callbackURL:"http://localhost:8080/api/sessions/githubCallback",
               },
