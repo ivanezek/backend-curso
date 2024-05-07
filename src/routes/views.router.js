@@ -1,10 +1,10 @@
 const Router = require('express').Router;
 const socketIO = require('socket.io');
-const ProductManager = require("../managers/productManager")
+const ProductManager = require("../dao/productManager")
 const viewsRouter = Router();
 const { modeloProductos } = require('../dao/models/productos.modelo'); 
 const { modeloCarts } = require('../dao/models/carts.modelo');
-const UserManager = require('../managers/userManager');
+const UserManager = require('../dao/userManager');
 
 let userManager = new UserManager();
 

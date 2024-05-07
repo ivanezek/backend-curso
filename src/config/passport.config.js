@@ -1,7 +1,7 @@
 const passport = require('passport');
 const local = require('passport-local');
 const github = require('passport-github2').Strategy;
-const UserManager = require('../managers/userManager');
+const UserManager = require('../dao/userManager');
 const { userModel } = require("../dao/models/users.modelo");
 const bcrypt = require('bcrypt');
 const config = require('./config');

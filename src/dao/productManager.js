@@ -1,4 +1,4 @@
-const { modeloProductos } = require('../dao/models/productos.modelo');
+const { modeloProductos } = require('./models/productos.modelo');
 
  class ProductManager {
   constructor() {

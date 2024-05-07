@@ -1,6 +1,6 @@
 const Router = require('express').Router;
 const { session } = require('passport');
-const UserManager = require('../managers/userManager');
+const UserManager = require('../dao/userManager');
 const sessionRouter = Router();
 const passport = require('passport');
 let userManager = new UserManager();

@@ -1,4 +1,4 @@
-const { userModel } = require("../dao/models/users.modelo");
+const { userModel } = require("./models/users.modelo");
 const bcrypt = require('bcrypt');
 
 class UserManager {
