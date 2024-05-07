@@ -12,6 +12,7 @@ const session = require("express-session");
 const passport = require("passport");
 const passportConfig = require("./config/passport.config");
 const connectMongo = require("connect-mongo");
+const config = require("./config/config")
 
 const PORT = 8080;
 const app = express();
@@ -61,10 +62,11 @@ server.listen(PORT, () => {
     console.log("Servidor OK en puerto", PORT);
   });
 
-
 const connect = async()=>{
     try{
-        await mongoose.connect("mongodb+srv://ivanrosales:cursoCoder@backend-db.g9wu9xl.mongodb.net/?retryWrites=true&w=majority&appName=backend-db&dbName=curso-coderhouse")
+        await mongoose.connect(config.MONGO_URL,{
+            dbName: config.DB_NAME
+        })
         console.log("Conectado a MongoDB")
     }catch(error){
         console.error("Error al conectar a MongoDB", error)

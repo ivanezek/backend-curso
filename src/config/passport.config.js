@@ -4,6 +4,7 @@ const github = require('passport-github2').Strategy;
 const UserManager = require('../managers/userManager');
 const { userModel } = require("../dao/models/users.modelo");
 const bcrypt = require('bcrypt');
+const config = require('./config');
 
 const userManager = new UserManager();
 
@@ -45,8 +46,8 @@ const passportConfig = () => {
           "githubLogin",
             new github(
               {
-                clientID:"info en el data.txt",
-                clientSecret:"info en el data.txt",
+                clientID:config.GITHUB_CLIENT_ID,
+                clientSecret:config.GITHUB_CLIENT_SECRET,
                 callbackURL:"http://localhost:8080/api/sessions/githubCallback",
               },
               async function(accessToken, refreshToken, profile, done){
