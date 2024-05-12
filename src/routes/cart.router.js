@@ -1,5 +1,4 @@
 const Router = require('express').Router;
-const CartManager = require("../dao/cartManager") 
 const cartRouter=Router()
 const CartController = require('../controller/cart.controller');
 
