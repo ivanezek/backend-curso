@@ -3,8 +3,12 @@ const sessionRouter = Router();
 const { session } = require('passport');
 const passport = require('passport');
 const SessionController = require('../controller/session.controller');
+const authenticate = require('../middlewares/auth');
 
 sessionRouter.get('/', SessionController.getUsers);
+
+// current
+sessionRouter.get('/current', authenticate, SessionController.currentUser);
 
 // Registro
 sessionRouter.get("/registerError", SessionController.registerError);

@@ -1,4 +1,5 @@
 const UserService = require('../services/user.service');
+const UserDTO = require('../dto/user.dto');
 
 class SessionController{
 
@@ -64,6 +65,23 @@ class SessionController{
                 res.redirect('/login'); 
             }
         });
+    }
+
+
+    // CURRENT USER
+    static async currentUser(req, res) {
+       try{
+        const userId = req.session.user._id;
+        const user = await UserService.getUserByFilter({ _id: userId });
+        if (!user) {
+            throw new Error('Usuario no encontrado');
+        }
+        const userDTO = new UserDTO(user);
+        res.json(userDTO);
+       }
+         catch(error){
+              res.status(500).json({error:error.message})
+         }
     }
 
 }
