@@ -1,12 +1,11 @@
-const UserManager = require('../dao/userManager');
-let userManager = new UserManager();
+const UserService = require('../services/user.service');
 
 class SessionController{
 
     // GET USERS
     static async getUsers(req, res) {
         try {
-            const users = await userManager.getUsers();
+            const users = await UserService.getUsers();
             res.json(users);
         } catch (error) {
             res.status(500).json({ error: error.message });

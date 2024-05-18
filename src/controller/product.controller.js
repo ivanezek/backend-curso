@@ -1,5 +1,6 @@
 const { modeloProductos } = require('../dao/models/productos.modelo'); 
 const ProductService = require('../services/product.service');
+const ProductDTO = require('../dto/product.dto');
 
 class ProductController{
     // GET PRODUCTS
@@ -30,19 +31,9 @@ class ProductController{
 
     // CREATE PRODUCT
     static async createProduct(req, res) {
-        const { title, description, price, thumbnail, code, stock, status, category } = req.body;
-
         try {
-            const newProduct = await ProductService.addProduct(
-                title,
-                description,
-                price,
-                thumbnail,
-                code,
-                stock,
-                status,
-                category
-            );
+            const productData = new ProductDTO(req.body);
+            const newProduct = await ProductService.addProduct(productData);
             res.status(201).json(newProduct);
         } catch (error) {
             res.status(400).json({ error: error.message });

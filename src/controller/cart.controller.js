@@ -25,22 +25,12 @@ class CartController {
     // GET CART BY ID
     static async getCartById(req, res) {
         const cartId = req.params.id;
-        try {
-
-            const cart = await CartService.getCartById(cartId);
-
-            cart.populate({
-                path: 'products.productId',
-                select: 'title price description code category stock status'
-            });
-
-            if (!cart) {
-                res.status(404).json({ error: 'Carrito no encontrado' });
-                return;
-            }
-            res.json(cart);
-        } catch (error) {
-            res.status(500).json({ error: 'Error interno del servidor' + error.message });
+        try{
+            const cartDTO = await CartService.getCartById(cartId);
+            res.json(cartDTO);
+        }
+        catch (error) {
+            res.status(500).json({ error: 'Error interno del servidor: ' + error.message });
         }
     }
 

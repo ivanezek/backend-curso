@@ -1,29 +1,28 @@
-const ProductManager = require("../dao/productManager")
+const { ProductDAO } = require('../dao/factory');
 
 class ProductService {
     constructor() {
-        this.productManager = new ProductManager()
+        this.productDAO = new ProductDAO()
     }
 
     async getProducts(limit = 2) {
-        return await this.productManager.getProducts(limit);
+        return await this.productDAO.getProducts(limit);
     }
 
     async addProduct(productData) {
-        const { title, description, price, thumbnail, code, stock, status, category } = productData;
-        return await this.productManager.addProduct(title, description, price, thumbnail, code, stock, status, category);
+        return await this.productDAO.addProduct(productData);
     }
 
     async getProductById(id) {
-        return await this.productManager.getProductById(id);
+        return await this.productDAO.getProductById(id);
     }
 
     async updateProduct(id, updatedFields) {
-        return await this.productManager.updateProduct(id, updatedFields);
+        return await this.productDAO.updateProduct(id, updatedFields);
     }
 
     async deleteProduct(id) {
-        return await this.productManager.deleteProduct(id);
+        return await this.productDAO.deleteProduct(id);
     }
 }
 
