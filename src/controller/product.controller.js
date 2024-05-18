@@ -1,7 +1,5 @@
-const ProductManager = require("../dao/productManager")
 const { modeloProductos } = require('../dao/models/productos.modelo'); 
-
-const productManager = new ProductManager()
+const ProductService = require('../services/product.service');
 
 class ProductController{
     // GET PRODUCTS
@@ -23,7 +21,7 @@ class ProductController{
     static async getProductById(req, res) {
         const productId = req.params.id;
         try {
-            const product = await productManager.getProductById(productId);
+            const product = await ProductService.getProductById(productId);
             res.json(product);
         } catch (error) {
             res.status(404).json({ error: 'Producto no encontrado' });
@@ -35,7 +33,7 @@ class ProductController{
         const { title, description, price, thumbnail, code, stock, status, category } = req.body;
 
         try {
-            const newProduct = await productManager.addProduct(
+            const newProduct = await ProductService.addProduct(
                 title,
                 description,
                 price,
@@ -57,7 +55,7 @@ class ProductController{
         const updatedFields = req.body;
 
         try {
-            const updatedProduct = await productManager.updateProduct(productId, updatedFields);
+            const updatedProduct = await ProductService.updateProduct(productId, updatedFields);
             res.json(updatedProduct);
         } catch (error) {
             res.status(404).json({ error: error.message });
@@ -68,7 +66,7 @@ class ProductController{
     static async deleteProduct(req, res) {
         const productId = req.params.id;
         try {
-            await productManager.deleteProduct(productId);
+            await ProductService.deleteProduct(productId);
             res.json({ message: 'Producto eliminado exitosamente' });
         } catch (error) {
             res.status(500).json({ error: error.message });

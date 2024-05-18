@@ -70,23 +70,6 @@ const { modeloProductos } = require('./models/productos.modelo');
       throw new Error('Error al eliminar el producto desde MongoDB: ' + error.message);
     }
   }
-
-  // saveProductsToFile() {
-  //   const data = JSON.stringify(this.products, null, 2);
-
-  //   fs.writeFileSync(this.path, data, 'utf8');
-  //   console.log(`Productos guardados en el archivo ${this.path}`);
-  // }
-
-  // loadProductsFromFile() {
-  //   try {
-  //     const data = fs.readFileSync(this.path, 'utf8');
-  //     this.products = JSON.parse(data);
-  //     console.log(`Productos cargados desde el archivo ${this.path}`);
-  //   } catch (error) {
-  //     console.error(`Error al cargar los productos desde el archivo ${this.path}:`, error.message);
-  //   }
-  // }
 }
 
 module.exports = ProductManager;
