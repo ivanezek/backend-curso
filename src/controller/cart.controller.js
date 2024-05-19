@@ -1,4 +1,6 @@
 const CartService = require('../services/cart.service');
+const ProductService = require('../services/product.service');
+const TicketService = require('../services/ticket.service');
 
 
 class CartController {
@@ -79,6 +81,50 @@ class CartController {
             res.json({ message: 'Carrito eliminado exitosamente' });
         } catch (error) {
             res.status(500).json({ error: 'Error al eliminar el carrito: ' + error.message });
+        }
+    }
+
+    static async purchaseCart(req, res) {
+        const { cartId } = req.params;
+        const userEmail = req.session.user.email;
+
+        try{
+            const cart = await CartService.getCartById(cartId);
+            if (!cart) {
+                return res.status(404).json({ error: 'Carrito no encontrado' });
+            }
+            let totalAmount = 0
+            const purchaseProducts = []
+
+            for (const item of cart.products) {
+                const product = await ProductService.getProductById(item.productId);
+
+                if(product.stock >= item.quantity){
+                   product.stock -= item.quantity;
+                   await ProductService.updateProduct(product._id, {stock: product.stock});
+                    totalAmount += product.price * item.quantity;
+                    purchaseProducts.push({
+                        productId: product._id,
+                        quantity: item.quantity,
+                        price: product.price
+                    });
+                }
+                else{
+                    return res.status(400).json({error: 'No hay suficiente stock para el producto ' + product.name});
+                }
+            }
+
+            const newTicket = await TicketService.createTicket({
+                amount: totalAmount,
+                purchaser: userEmail,
+            });
+
+            await CartService.removeAllProductsFromCart(cartId);
+
+            res.status(200).json({ message: 'Compra realizada exitosamente', ticket: newTicket });
+        }
+        catch (error) {
+            res.status(500).json({ error: 'Error al realizar la compra: ' + error.message });
         }
     }
 }

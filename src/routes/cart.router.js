@@ -25,6 +25,6 @@ cartRouter.put('/:cartId/products/:productId', CartController.updateProductQuant
 
 cartRouter.delete('/:cartId', CartController.removeAllProductsFromCart);
 
-
+cartRouter.post('/:cartId/purchase', isUser, CartController.purchaseCart);
 
 module.exports = cartRouter;
