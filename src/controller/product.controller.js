@@ -1,6 +1,9 @@
 const { modeloProductos } = require('../dao/models/productos.modelo'); 
 const ProductService = require('../services/product.service');
 const ProductDTO = require('../dto/product.dto');
+const {generateMockProducts} = require('../utils/mocking');
+const CustomError = require('../errors/customError');
+const errorList = require('../utils/errorList');
 
 class ProductController{
     // GET PRODUCTS
@@ -19,13 +22,16 @@ class ProductController{
     }
 
     // GET PRODUCT BY ID
-    static async getProductById(req, res) {
+    static async getProductById(req, res, next) {
         const productId = req.params.id;
         try {
             const product = await ProductService.getProductById(productId);
+            if (!product) {
+                throw new CustomError(errorList.PRODUCT_NOT_FOUND.status, errorList.PRODUCT_NOT_FOUND.code, errorList.PRODUCT_NOT_FOUND.message);
+            }
             res.json(product);
         } catch (error) {
-            res.status(404).json({ error: 'Producto no encontrado' });
+            next(error);
         }
     }
 
@@ -62,6 +68,11 @@ class ProductController{
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
+    }
+
+    static async mockProducts(req, res) {
+        const mockProducts = generateMockProducts(100);
+        res.json(mockProducts);
     }
 }
 
