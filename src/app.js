@@ -12,13 +12,21 @@ const session = require("express-session");
 const passport = require("passport");
 const passportConfig = require("./config/passport.config");
 const connectMongo = require("connect-mongo");
-const config = require("./config/config")
-
+const config = require("./config/config");
+const errorHandler = require('./middlewares/errorHandler');
+const logger = require('./utils/logger');
 const PORT = 8080;
+
 const app = express();
 const server = http.createServer(app)
 const io = socketIO(server);
 
+app.use((req, res, next) =>{
+    logger.http(`${req.method} - ${req.url}`);
+    next();
+});
+
+app.use(errorHandler);
 
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
@@ -59,7 +67,7 @@ app.use((req, res) => {
 });
 
 server.listen(PORT, () => {
-    console.log("Servidor OK en puerto", PORT);
+    logger.info(`Servidor escuchando en http://localhost:${PORT}`);
   });
 
 const connect = async()=>{
@@ -67,9 +75,9 @@ const connect = async()=>{
         await mongoose.connect(config.MONGO_URL,{
             dbName: config.DB_NAME
         })
-        console.log("Conectado a MongoDB")
+        logger.info("Conectado a MongoDB")
     }catch(error){
-        console.error("Error al conectar a MongoDB", error)
+        logger.error(`Error al conectar a MongoDB: ${error.message}`)
     }
 }
 

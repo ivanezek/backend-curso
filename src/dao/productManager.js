@@ -1,3 +1,4 @@
+const logger = require('../utils/logger');
 const { modeloProductos } = require('./models/productos.modelo');
 
  class ProductManager {
@@ -36,7 +37,7 @@ const { modeloProductos } = require('./models/productos.modelo');
     try {
         return await modeloProductos.findOne({ _id: id });
     } catch (error) {
-        console.error('Error al obtener el producto por ID:', error);
+        logger.error('Error al obtener el producto por ID desde MongoDB: ' + error.message);
         throw error;
     }
   }

@@ -6,6 +6,9 @@ const { isAdmin } = require('../middlewares/roleAuth');
 
 
 productRouter.get('/mockingproducts', ProductController.mockProducts)
+
+productRouter.get('/loggerTest', ProductController.loggerTest)
+
 // METODO GET PARA OBTENER LOS PRODUCTOS
 productRouter.get('/', ProductController.getAllProducts);
 
@@ -22,7 +25,6 @@ productRouter.put('/:id', isAdmin, ProductController.updateProduct);
 
 // METODO DELETE PARA ELIMINAR UN PRODUCTO
 productRouter.delete('/:id', isAdmin, ProductController.deleteProduct);
-
 
 
 module.exports = productRouter;

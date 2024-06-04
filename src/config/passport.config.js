@@ -5,6 +5,7 @@ const UserManager = require('../dao/userManager');
 const { userModel } = require("../dao/models/users.modelo");
 const bcrypt = require('bcrypt');
 const config = require('./config');
+const logger = require('../utils/logger');
 
 const userManager = new UserManager();
 
@@ -75,7 +76,7 @@ const passportConfig = () => {
           },
           async (username, password, done) => {
             try {
-              console.log({username})
+              logger.info(`Login attempt for user ${username}`);
               const user = await userManager.getUserByFilter({email: username });
               if (!user) {
                 res.setHeader("Content-Type", "application/json");

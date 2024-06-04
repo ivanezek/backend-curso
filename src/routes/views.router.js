@@ -1,11 +1,12 @@
 const Router = require('express').Router;
 const viewsRouter = Router();
 const ViewsController = require('../controller/views.controller');
+const logger = require('../utils/logger');
 
 
 function handleRealTimeProductsSocket(io) {
   io.on('connection', async(socket) => {
-      console.log('Usuario conectado a la ruta /realtimeproducts');
+      logger.info('Un cliente se ha conectado a /realtimeproducts');
       const products = await productManager.getProducts();
       socket.emit('products', products);
   });

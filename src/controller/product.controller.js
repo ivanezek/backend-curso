@@ -4,6 +4,7 @@ const ProductDTO = require('../dto/product.dto');
 const {generateMockProducts} = require('../utils/mocking');
 const CustomError = require('../errors/customError');
 const errorList = require('../utils/errorList');
+const logger = require('../utils/logger');
 
 class ProductController{
     // GET PRODUCTS
@@ -73,6 +74,23 @@ class ProductController{
     static async mockProducts(req, res) {
         const mockProducts = generateMockProducts(100);
         res.json(mockProducts);
+    }
+
+    static async loggerTest(req, res){
+        try{
+            logger.debug('Debug message');
+            logger.info('Info message');
+            logger.warning('Warn message');
+            logger.error('Error message');
+            logger.fatal('Fatal message');
+            logger.http('HTTP message');
+
+            res.status(200).json({message: 'Log messages sent successfully'});
+        }
+        catch(error){
+            logger.error('Error in loggerTest:', error);
+            res.status(500).json({error: 'Error generating logs'});   
+        }
     }
 }
 

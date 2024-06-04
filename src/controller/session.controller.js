@@ -1,5 +1,6 @@
 const UserService = require('../services/user.service');
 const UserDTO = require('../dto/user.dto');
+const logger = require('../utils/logger');
 
 class SessionController{
 
@@ -59,7 +60,7 @@ class SessionController{
     static async logout(req, res) {
         req.session.destroy(err => {
             if (err) {
-                console.error('Error al cerrar sesión:', err);
+                logger.error('Error al cerrar sesión.', err);
                 res.status(500).send('Error al cerrar sesión.');
             } else {
                 res.redirect('/login'); 
