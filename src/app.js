@@ -15,6 +15,8 @@ const connectMongo = require("connect-mongo");
 const config = require("./config/config");
 const errorHandler = require('./middlewares/errorHandler');
 const logger = require('./utils/logger');
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsDoc = require('swagger-jsdoc');
 const PORT = 8080;
 
 const app = express();
@@ -36,6 +38,7 @@ app.use(session({
     saveUninitialized: true,
     store: connectMongo.create({mongoUrl: "mongodb+srv://ivanrosales:cursoCoder@backend-db.g9wu9xl.mongodb.net/?retryWrites=true&w=majority&appName=backend-db&dbName=curso-coderhouse"})
 }))
+
 
 // inicializacion de passport
 passportConfig()
@@ -60,14 +63,28 @@ app.use("/api/carts", cartRouter)
 
 handleRealTimeProductsSocket(io);
 
+const options = {
+    definition: {
+        openapi: "3.0.0",
+        info:{
+            title: "API de Coderhousse",
+            version: "1.0.0",
+            description: "API de Backend para el curso de Coderhouse"
+        },
+    },
+        apis: ["./docs/Products.yaml"]
+}
+    
+const spec = swaggerJsDoc(options);
 
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(spec));
 
 app.use((req, res) => {
     res.status(404).json({ error: 'Ruta no encontrada' });
 });
 
 server.listen(PORT, () => {
-    logger.info(`Servidor escuchando en http://localhost:${PORT}`);
+    logger.info(`Servidor escuchando ahora en http://localhost:${PORT}`);
   });
 
 const connect = async()=>{
