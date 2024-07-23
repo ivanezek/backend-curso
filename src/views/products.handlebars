@@ -5,7 +5,12 @@
 
 <ul>
     {{#each products}}
-    <li>{{this.title}} - {{description}} - $ {{price}} </li>
+    <li>
+        <a href="/products/{{this._id}}">{{this.title}}</a>
+    </li>
+    <li>{{description}}</li>
+    <li>$ {{price}}</li>
+    <hr>
     {{/each}}
 </ul>
 

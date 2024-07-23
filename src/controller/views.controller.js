@@ -3,6 +3,11 @@ const { modeloProductos } = require('../dao/models/productos.modelo');
 const { modeloCarts } = require('../dao/models/carts.modelo');
 const UserManager = require('../dao/userManager');
 const logger = require("../utils/logger");
+const mongoose = require('mongoose');
+const CartService = require('../services/cart.service');
+const ProductService = require('../services/product.service');
+const TicketService = require('../services/ticket.service');
+
 
 let userManager = new UserManager();
 
@@ -60,6 +65,9 @@ class ViewsController{
     static async getProductById(req, res) {
         try {
             const productId = req.params.id;
+            if (!mongoose.Types.ObjectId.isValid(productId)) {
+                return res.status(400).send('ID de producto inválido.');
+            }
             const product = await modeloProductos.findById(productId).lean();
             if (!product) {
                 return res.status(404).send('El producto no fue encontrado.');
@@ -75,6 +83,9 @@ class ViewsController{
     static async getCartById(req, res) {
         try {
             const cartId = req.params.id;
+            if (!mongoose.Types.ObjectId.isValid(cartId)) {
+                return res.status(400).send('ID de carrito inválido.');
+            }
             const cart = await modeloCarts.findById(cartId).populate('products').lean();
             if (!cart) {
                 return res.status(404).send('El carrito no fue encontrado.');
@@ -123,6 +134,50 @@ class ViewsController{
     static async getRealtimeProducts(req, res) {
         const products = await productManager.getProducts();
         res.status(200).render('realtimeproducts', { products });
+    }
+
+    // TICKET VIEW
+    static async getTicket(req, res) {
+        const { cartId } = req.params;
+        const userEmail = req.session.user.email;
+    
+        try {
+            const cart = await CartService.getCartById(cartId);
+            if (!cart) {
+                return res.status(404).json({ error: 'Carrito no encontrado' });
+            }
+            let totalAmount = 0;
+            const purchaseProducts = [];
+    
+            for (const item of cart.products) {
+                const product = await ProductService.getProductById(item.productId);
+    
+                if (product.stock >= item.quantity) {
+                    product.stock -= item.quantity;
+                    await ProductService.updateProduct(product._id, { stock: product.stock });
+                    totalAmount += product.price * item.quantity;
+                    purchaseProducts.push({
+                        productId: product._id,
+                        quantity: item.quantity,
+                        price: product.price
+                    });
+                } else {
+                    return res.status(400).json({ error: 'No hay suficiente stock para el producto ' + product.name });
+                }
+            }
+    
+            const newTicket = await TicketService.createTicket({
+                amount: totalAmount,
+                purchaser: userEmail,
+                products: purchaseProducts
+            });
+    
+            await CartService.removeAllProductsFromCart(cartId);
+    
+            res.render('ticket', { ticket: newTicket });
+        } catch (error) {
+            res.status(500).json({ error: 'Error al realizar la compra: ' + error.message });
+        }
     }
 }
 

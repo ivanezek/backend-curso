@@ -1,4 +1,4 @@
-const TicketService = require('../service/ticket.service');
+const TicketService = require('../services/ticket.service');
 
 class TicketController {
     // GET TICKETS

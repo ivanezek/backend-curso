@@ -1,6 +1,6 @@
 const UserManager = require('../dao/userManager');
 const UserDTO = require('../dto/user.dto');
-
+const userModel = require('../dao/models/users.modelo');
 class UserService{
     constructor(){
         this.userDAO = new UserManager();
@@ -29,6 +29,7 @@ class UserService{
         }
         return new UserDTO(user);
     }
+
 }
 
 module.exports = new UserService();

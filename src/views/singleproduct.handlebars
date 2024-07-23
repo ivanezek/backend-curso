@@ -2,4 +2,39 @@
     <p>Precio: {{ product.price }}</p>
     <p>Descripción: {{ product.description }}</p>
 
-<button>agregar al carrito</button>
+<button id="addToCart" data-product-id="{{product._id}}">Agregar al carrito</button>
+
+
+<hr>
+{{>menu}}
+
+<script>
+document.getElementById('addToCart').addEventListener('click', async function() {
+    const productId = this.getAttribute('data-product-id');
+    const cartTotalElement = document.getElementById('cartTotal');
+    const cartId = '66031d63559259c38e6ce79e';
+
+    try {
+        const response = await fetch(`/api/carts/${cartId}/products`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                productId,
+                quantity: 1
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al agregar producto al carrito');
+        }
+
+        const result = await response.json();
+        alert('Producto agregado al carrito');
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Hubo un problema al agregar el producto al carrito');
+    }
+});
+</script>

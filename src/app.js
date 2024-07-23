@@ -15,8 +15,9 @@ const connectMongo = require("connect-mongo");
 const config = require("./config/config");
 const errorHandler = require('./middlewares/errorHandler');
 const logger = require('./utils/logger');
-const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+const ticketRouter = require("./routes/tickets.router");
 const PORT = 8080;
 
 const app = express();
@@ -30,8 +31,25 @@ app.use((req, res, next) =>{
 
 app.use(errorHandler);
 
+const options = {
+    definition: {
+        openapi: "3.0.0",
+        info:{
+            title: "API de Coderhousse",
+            version: "1.0.0",
+            description: "API de Backend para el curso de Coderhouse"
+        },
+    },
+        apis: ["./docs/Products.yaml"]
+}
+    
+const spec = swaggerJsDoc(options);
+
+
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(spec));
+
 app.use(session({
     secret: "secreto",
     resave: true,
@@ -51,6 +69,17 @@ app.engine("handlebars", handlebars.engine({
         allowProtoPropertiesByDefault: true,
         allowProtoMethodsByDefault: true,
     },
+    helpers:{
+        calculateTotal: function(cart){
+            let total = 0;
+            if (cart && cart.products){
+                for (let product of cart.products){
+                    total += product.price * product.quantity;
+                }
+            }
+            return total.toFixed(2);
+        }
+    }
 }))
 app.set("view engine", "handlebars")
 app.set("views", path.join(__dirname, "views"))
@@ -60,24 +89,13 @@ app.use("/", viewsRouter)
 app.use("/api/products", productRouter)
 app.use("/api/sessions", sessionsRouter)
 app.use("/api/carts", cartRouter)
+app.use("/api/tickets", ticketRouter)
 
 handleRealTimeProductsSocket(io);
 
-const options = {
-    definition: {
-        openapi: "3.0.0",
-        info:{
-            title: "API de Coderhousse",
-            version: "1.0.0",
-            description: "API de Backend para el curso de Coderhouse"
-        },
-    },
-        apis: ["./docs/Products.yaml"]
-}
-    
-const spec = swaggerJsDoc(options);
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(spec));
+
+
 
 app.use((req, res) => {
     res.status(404).json({ error: 'Ruta no encontrada' });
@@ -97,5 +115,6 @@ const connect = async()=>{
         logger.error(`Error al conectar a MongoDB: ${error.message}`)
     }
 }
+
 
 connect()

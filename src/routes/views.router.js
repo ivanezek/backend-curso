@@ -27,6 +27,9 @@ viewsRouter.get('/cart/:id', ViewsController.getCartById);
 // VISTA LOGIN
 viewsRouter.get('/login', ViewsController.getLogin);
 
+// VISTA TICKET 
+viewsRouter.get('/purchase/:cartId/ticket', ViewsController.getTicket);
+
 // VISTA Register
 viewsRouter.get('/register', ViewsController.getRegister);
 

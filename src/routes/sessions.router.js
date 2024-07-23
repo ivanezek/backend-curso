@@ -4,6 +4,8 @@ const { session } = require('passport');
 const passport = require('passport');
 const SessionController = require('../controller/session.controller');
 const authenticate = require('../middlewares/auth');
+const { isUser, isAdmin } = require('../middlewares/roleAuth');
+
 
 sessionRouter.get('/', SessionController.getUsers);
 
@@ -11,6 +13,7 @@ sessionRouter.get('/', SessionController.getUsers);
 sessionRouter.get('/current', authenticate, SessionController.currentUser);
 
 // Registro
+sessionRouter.post("/register", SessionController.register)
 sessionRouter.get("/registerError", SessionController.registerError);
   
   // Login 
@@ -30,5 +33,6 @@ sessionRouter.get("/registerError", SessionController.registerError);
 // LOGOUT
 sessionRouter.get('/logout', SessionController.logout);
 
+// DELETE USERS 
 
 module.exports = sessionRouter;
