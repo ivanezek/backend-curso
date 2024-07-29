@@ -1,6 +1,8 @@
 const UserService = require('../services/user.service');
 const UserDTO = require('../dto/user.dto');
-const logger = require('../utils/logger');
+const logger = require("../utils/logger");
+const { userModel } = require('../dao/models/users.modelo');
+const { envioMail } = require('../config/mailing.config');
 
 class SessionController{
 
@@ -21,7 +23,14 @@ class SessionController{
     }
 
     static async register(req, res) {
-        return res.redirect("/register?message=¡Registro correcto!");
+        try{
+            const { username, email, password, role } = req.body;
+            const newUser = await UserService.addUser({ username, email, password, role });
+            res.redirect("/login?message=¡Registro correcto!");
+        }
+        catch(error){
+            res.redirect("/registerError?error=Error en registro");
+        }
     }
 
     // LOGIN NATIVO
@@ -83,6 +92,36 @@ class SessionController{
          catch(error){
               res.status(500).json({error:error.message})
          }
+    }
+
+    // DELETE USER INACTIVE
+    static async deleteUserInactive(req, res) {
+        try {
+           const threeDaysAgo = new Date();
+           threeDaysAgo.setDate(oneDayOff.getDate() - 3);
+           const inactiveUsers = await userModel.find({
+            $or: [
+                { lastConnection: { $exists: true, $lt: threeDaysAgo } },
+                { lastConnection: { $exists: false } }
+            ]
+        });
+        if (inactiveUsers.length === 0) {
+            return res.status(200).json({ message: 'No hay usuarios inactivos para eliminar' });
+        }
+
+        const emailsDeleting = inactiveUsers.map(user => user.email);
+
+        for (const email of emailsDeleting) {
+            await envioMail(email, 'Cuenta eliminada', 'Tu cuenta ha sido eliminada por inactividad');
+        }
+
+        await userModel.deleteMany({_id: { $in: inactiveUsers.map(user => user._id) }});
+        logger.info('Usuarios eliminados por inactividad', emailsDeleting);
+
+        } catch (error) {
+            logger.error('Error al eliminar usuarios inactivos', error);
+            res.status(500).json({ error: error.message });
+        }
     }
 
 }

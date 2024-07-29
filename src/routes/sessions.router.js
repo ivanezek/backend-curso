@@ -29,6 +29,7 @@ sessionRouter.get("/registerError", SessionController.registerError);
 
   sessionRouter.get("/githubCallback", passport.authenticate("githubLogin", {failureRedirect:"api/sessions/githubError"}), SessionController.githubCallback);
 
+  sessionRouter.delete("/inactive", SessionController.deleteUserInactive)
 
 // LOGOUT
 sessionRouter.get('/logout', SessionController.logout);

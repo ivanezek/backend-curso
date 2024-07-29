@@ -73,4 +73,4 @@ const { addColors } = require('winston/lib/winston/config');
 
 addColors(logLevels.colors);
 
-module.exports = logger;
+module.exports =  logger;

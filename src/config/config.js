@@ -14,9 +14,9 @@ const config = {
     DB_NAME: process.env.DB_NAME,
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
-    PERSISTENCE: process.env.PERSISTENCE || 'mongo'
+    PERSISTENCE: process.env.PERSISTENCE || 'mongo',
+    EMAIL: process.env.EMAIL,
+    MAILPASSWORD: process.env.MAILPASSWORD,
 };
-
-
 
 module.exports = config;
