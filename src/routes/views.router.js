@@ -2,6 +2,7 @@ const Router = require('express').Router;
 const viewsRouter = Router();
 const ViewsController = require('../controller/views.controller');
 const logger = require('../utils/logger');
+const { isAdmin } = require('../middlewares/roleAuth');
 
 
 function handleRealTimeProductsSocket(io) {
@@ -38,5 +39,7 @@ viewsRouter.get('/profile', ViewsController.getProfile);
 
 // RUTA REALTIME PRODUCTS
 viewsRouter.get('/realtimeproducts', ViewsController.getRealtimeProducts);
+
+viewsRouter.get('/admin', isAdmin, ViewsController.getAdminPanel)
 
   module.exports = { viewsRouter, handleRealTimeProductsSocket };

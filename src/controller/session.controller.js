@@ -3,6 +3,7 @@ const UserDTO = require('../dto/user.dto');
 const logger = require("../utils/logger");
 const { userModel } = require('../dao/models/users.modelo');
 const { envioMail } = require('../config/mailing.config');
+const mongoose = require('mongoose');
 
 class SessionController{
 
@@ -122,6 +123,53 @@ class SessionController{
             logger.error('Error al eliminar usuarios inactivos', error);
             res.status(500).json({ error: error.message });
         }
+    }
+
+    // UPDATE USER ROLE
+    static async updateUserRole(req, res) {
+        const { userId, role } = req.body;
+        console.log('Received userId:', userId); // Verifica qué se recibe
+
+        try {
+            if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+                throw new Error('ID de usuario inválido');
+            }
+    
+            const user = await userModel.findById(userId);
+            if (!user) {
+                throw new Error('Usuario no encontrado');
+            }
+    
+            user.role = role;
+            await user.save();
+            logger.info('Rol de usuario actualizado', { userId, role });
+    
+            res.redirect("/admin");
+        } catch (error) {
+            if (!res.headersSent) {
+                res.status(500).json({ error: error.message });
+            }
+            logger.error('Error al actualizar el rol de usuario', error);
+        }
+    }
+
+    // DELETE SINGLE USER
+    static async deleteUser(req, res) {
+        const { userId } = req.body;
+
+        try{
+            const user = await userModel.findById(userId);
+            if (!user) {
+                throw new Error('Usuario no encontrado');
+            }
+
+            await userModel.deleteOne({ _id: userId });
+            res.redirect('/admin');
+            logger.info('Usuario eliminado', { userId });
+        }
+        catch(error){
+            res.status(500).json({error:error.message})
+        }  
     }
 
 }

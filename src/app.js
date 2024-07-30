@@ -63,7 +63,6 @@ passportConfig()
 app.use(passport.initialize())
 app.use(passport.session())
 app.use(express.static(path.join(__dirname, "public")))
-
 app.engine("handlebars", handlebars.engine({
     runtimeOptions: {
         allowProtoPropertiesByDefault: true,
@@ -78,6 +77,9 @@ app.engine("handlebars", handlebars.engine({
                 }
             }
             return total.toFixed(2);
+        },
+        eq: function (a, b) {
+            return a === b;
         }
     }
 }))

@@ -4,7 +4,7 @@ const { session } = require('passport');
 const passport = require('passport');
 const SessionController = require('../controller/session.controller');
 const authenticate = require('../middlewares/auth');
-const { isUser, isAdmin } = require('../middlewares/roleAuth');
+const { isAdmin } = require('../middlewares/roleAuth');
 
 
 sessionRouter.get('/', SessionController.getUsers);
@@ -29,7 +29,11 @@ sessionRouter.get("/registerError", SessionController.registerError);
 
   sessionRouter.get("/githubCallback", passport.authenticate("githubLogin", {failureRedirect:"api/sessions/githubError"}), SessionController.githubCallback);
 
-  sessionRouter.delete("/inactive", SessionController.deleteUserInactive)
+  sessionRouter.delete("/inactive", isAdmin, SessionController.deleteUserInactive)
+
+  sessionRouter.post("/:id", isAdmin, SessionController.deleteUser)
+
+  sessionRouter.post("/:id/role", isAdmin, SessionController.updateUserRole)
 
 // LOGOUT
 sessionRouter.get('/logout', SessionController.logout);

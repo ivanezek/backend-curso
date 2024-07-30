@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const CartService = require('../services/cart.service');
 const ProductService = require('../services/product.service');
 const TicketService = require('../services/ticket.service');
+const userService = require("../services/user.service");
 
 
 let userManager = new UserManager();
@@ -177,6 +178,15 @@ class ViewsController{
             res.render('ticket', { ticket: newTicket });
         } catch (error) {
             res.status(500).json({ error: 'Error al realizar la compra: ' + error.message });
+        }
+    }
+    static async getAdminPanel(req, res) {
+        try {
+            const users = await userService.getUsers();
+            res.status(200).render('adminPanel', { users });
+        } catch (error) {
+            logger.error('Error al obtener usuarios para la vista de administración:', error);
+            res.status(500).send('Error al procesar la solicitud.');
         }
     }
 }
