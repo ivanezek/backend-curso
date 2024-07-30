@@ -106,14 +106,12 @@ app.use((req, res) => {
 });
 
 server.listen(PORT, () => {
-    logger.info(`Servidor escuchando ahora en http://localhost:${PORT}`);
+    logger.info(`Servidor escuchando ahora en ${PORT}`);
   });
 
 const connect = async()=>{
     try{
-        await mongoose.connect(config.MONGO_URL,{
-            dbName: config.DB_NAME
-        })
+        await mongoose.connect(config.MONGO_URL)
         logger.info("Conectado a MongoDB")
     }catch(error){
         logger.error(`Error al conectar a MongoDB: ${error.message}`)
