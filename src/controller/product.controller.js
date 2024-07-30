@@ -5,6 +5,10 @@ const {generateMockProducts} = require('../utils/mocking');
 const CustomError = require('../errors/customError');
 const errorList = require('../utils/errorList');
 const logger = require('../utils/logger');
+const productService = require('../services/product.service');
+const { userModel } = require('../dao/models/users.modelo');
+const { envioMail } = require('../config/mailing.config');
+
 
 class ProductController{
     // GET PRODUCTS
@@ -62,8 +66,25 @@ class ProductController{
 
     // DELETE PRODUCT
     static async deleteProduct(req, res) {
-        const productId = req.params.id;
         try {
+            const productId = req.params.id;
+            const product = await productService.getProductById(productId);
+
+            if (!product) {
+                throw new CustomError(errorList.PRODUCT_NOT_FOUND.status, errorList.PRODUCT_NOT_FOUND.code, errorList.PRODUCT_NOT_FOUND.message);
+            }
+
+            const owner = await userModel.findOne({ _id: product.owner });
+            if(!owner){
+                throw new CustomError(errorList.USER_NOT_FOUND.status, errorList.USER_NOT_FOUND.code, errorList.USER_NOT_FOUND.message);
+            }
+
+            if(owner.role === "premium"){
+                const subject="Producto eliminado";
+                const message = `El producto ${product.title} ha sido eliminado por un administrador`;
+                await envioMail(owner.email, subject, message);
+            }
+
             await ProductService.deleteProduct(productId);
             res.json({ message: 'Producto eliminado exitosamente' });
         } catch (error) {

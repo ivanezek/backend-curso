@@ -10,7 +10,8 @@ const productosSchema = new mongoose.Schema({
     code: String,
     stock: { type: Number, required: true, min: 0 },
     status: Boolean,
-    category: String
+    category: String,
+    owner: {type: String, default: "admin"}
 }, { timestamps: true });
 
 productosSchema.plugin(paginate)
