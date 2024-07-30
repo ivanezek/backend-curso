@@ -18,6 +18,7 @@ const logger = require('./utils/logger');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const ticketRouter = require("./routes/tickets.router");
+const authenticate = require("./middlewares/auth");
 const PORT = 8080;
 
 const app = express();
@@ -87,6 +88,7 @@ app.set("view engine", "handlebars")
 app.set("views", path.join(__dirname, "views"))
 
 //RUTAS
+app.use(authenticate)
 app.use("/", viewsRouter)
 app.use("/api/products", productRouter)
 app.use("/api/sessions", sessionsRouter)

@@ -5,15 +5,24 @@
     <li>
         <a href="/register">Registro</a>
     </li>
-    <li>
-        <a href="/login">Login</a>
-    </li>
+    {{#unless isAuthenticated}}
+        <li>
+            <a href="/login">Login</a>
+        </li>
+    {{/unless}}
     <li>
         <a href="/products">Productos</a>
     </li>
-    <li>
-        <a href="/api/sessions/logout">Logout</a>
-    </li>
+    {{#if isAuthenticated}}
+        <li>
+            <a href="/api/sessions/logout">Logout</a>
+        </li>
+        {{#if isAdmin}}
+            <li>
+                <a href="/admin">Admin</a>
+            </li>
+        {{/if}}
+    {{/if}}
     <li>
         <a href="/cart/66031d63559259c38e6ce79e">Carrito</a>
     </li>
