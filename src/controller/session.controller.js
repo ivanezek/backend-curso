@@ -4,6 +4,7 @@ const logger = require("../utils/logger");
 const { userModel } = require('../dao/models/users.modelo');
 const { envioMail } = require('../config/mailing.config');
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 class SessionController{
 
@@ -20,7 +21,7 @@ class SessionController{
     // REGISTER
 
     static async registerError(req, res) {
-        res.redirect("/register?message=Error en registro");
+        return res.status(500).json({error: "Error en registro"});
     }
 
     static async register(req, res) {
@@ -37,16 +38,29 @@ class SessionController{
     // LOGIN NATIVO
 
     static async loginError(req, res) {
-        res.redirect("/login?error=Error en login");
+        return res.status(401).json({error: "Error en login"});
     }
 
     static async login(req, res) {
-        let user=req.user
-        user={...user}
-        delete user.password
-        req.session.user =user 
-
-        res.redirect("/products");
+        const { email, password } = req.body;
+    
+        try {
+            const user = await userModel.findOne({ email });
+            if (!user) {
+                return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
+            }
+    
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+            if (!isPasswordValid) {
+                return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
+            }
+                req.session.user = { ...user._doc };
+            delete req.session.user.password;
+    
+            return res.status(200).json({ payload: "Login successful", user: req.session.user });
+        } catch (error) {
+            return res.status(500).json({ error: 'Error en el servidor, por favor intente más tarde.' });
+        }
     }
 
     // GITHUB ERROR
@@ -73,7 +87,7 @@ class SessionController{
                 logger.error('Error al cerrar sesión.', err);
                 res.status(500).send('Error al cerrar sesión.');
             } else {
-                res.redirect('/login'); 
+                res.status(200).json({ message: 'Sesión cerrada' }); 
             }
         });
     }
@@ -81,19 +95,24 @@ class SessionController{
 
     // CURRENT USER
     static async currentUser(req, res) {
-       try{
-        const userId = req.session.user._id;
-        const user = await UserService.getUserByFilter({ _id: userId });
-        if (!user) {
-            throw new Error('Usuario no encontrado');
+        try {
+          if (!req.session.user || !req.session.user._id) {
+            return res.status(401).json({ error: 'No hay usuario logueado.' });
+          }
+      
+          const userId = req.session.user._id;
+          const user = await UserService.getUserByFilter({ _id: userId });
+      
+          if (!user) {
+            return res.status(404).json({ error: 'Usuario no encontrado.' });
+          }
+      
+          const userDTO = new UserDTO(user);
+          res.status(200).json(userDTO);
+        } catch (error) {
+          res.status(500).json({ error: 'Error al obtener usuario actual.' });
         }
-        const userDTO = new UserDTO(user);
-        res.json(userDTO);
-       }
-         catch(error){
-              res.status(500).json({error:error.message})
-         }
-    }
+      }
 
     // DELETE USER INACTIVE
     static async deleteUserInactive(req, res) {

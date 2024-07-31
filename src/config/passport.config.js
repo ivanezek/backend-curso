@@ -74,20 +74,18 @@ const passportConfig = () => {
           {
             usernameField: "email"
           },
-          async (username, password, done) => {
+          async (email, password, done) => {
             try {
-              logger.info(`Login attempt for user ${username}`);
-              const user = await userManager.getUserByFilter({email: username });
+              const user = await userManager.getUserByFilter({ email });
               if (!user) {
-                res.setHeader("Content-Type", "application/json");
-                return res.status(401).json({error: "Credenciales incorrectas"});
+                return done(null, false, { message: "Credenciales incorrectas" });
               }
-              
-              const validatePassword=(user, password)=>bcrypt.compareSync(password, user.password)
-              if (!validatePassword) {
-                return done(null, false);
+      
+              const isPasswordValid = bcrypt.compareSync(password, user.password);
+              if (!isPasswordValid) {
+                return done(null, false, { message: "Credenciales incorrectas" });
               }
-    
+      
               return done(null, user);
             } catch (error) {
               return done(error);

@@ -38,6 +38,5 @@ sessionRouter.get("/registerError", SessionController.registerError);
 // LOGOUT
 sessionRouter.get('/logout', SessionController.logout);
 
-// DELETE USERS 
 
 module.exports = sessionRouter;
