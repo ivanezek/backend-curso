@@ -47,7 +47,11 @@ class ProductController{
             const newProduct = await ProductService.addProduct(productData);
             res.status(201).json(newProduct);
         } catch (error) {
-            res.status(400).json({ error: error.message });
+            if (error.code === 11000 && error.keyPattern && error.keyPattern.code) {
+                res.status(400).json({ error: 'El código del producto ya existe. Por favor, elige un código diferente.' });
+            } else {
+                res.status(400).json({ error: error.message });
+            }
         }
     }
 

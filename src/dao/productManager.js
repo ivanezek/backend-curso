@@ -15,23 +15,33 @@ const { modeloProductos } = require('./models/productos.modelo');
     }
   }
 
-  async addProduct(title, description, price, thumbnail, code, stock, status, category) {
+  async addProduct(productData) {
     try {
-      const newProduct = await modeloProductos.create({
-        title: title,
-        description: description,
-        price: price,
-        thumbnail: thumbnail,
-        code: code,
-        stock: stock,
-        status: status,
-        category: category
-      });
-      return newProduct;
+        const { title, description, price, thumbnail, code, stock, status, category } = productData;
+
+        if (!title || !price || !stock) {
+            throw new Error('Los campos title, price y stock son requeridos');
+        }
+
+        const newProduct = await modeloProductos.create({
+            title: String(title), 
+            description: description,
+            price: Number(price),  
+            thumbnail: thumbnail,
+            code: code,
+            stock: Number(stock),  
+            status: Boolean(status),  
+            category: category
+        });
+
+        return newProduct;
     } catch (error) {
-      throw new Error('Error al agregar el producto a MongoDB: ' + error.message);
+      if(error.code === 11000) {
+        throw new Error('El código del producto ya está en uso. Por favor, elige un código diferente.');
+      }
+      throw new Error('Error al agregar un producto en MongoDB. ' + error.message);
     }
-  }
+}
 
   async getProductById(id) {
     try {

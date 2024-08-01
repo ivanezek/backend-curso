@@ -7,7 +7,7 @@ const productosSchema = new mongoose.Schema({
     description: String, 
     price: { type: Number, required: true, min: 0 },
     thumbnail: String,
-    code: String,
+    code: { type: String, required: true, unique: true },
     stock: { type: Number, required: true, min: 0 },
     status: Boolean,
     category: String,
