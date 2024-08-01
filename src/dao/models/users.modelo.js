@@ -4,6 +4,9 @@ const mongoose = require("mongoose")
 const usersColl = "users"
 const userSchema = new mongoose.Schema({
     username: { type: String },
+    first_name: { type: String },
+    last_name: { type: String },
+    age: { type: Number },
     email: { type: String, unique: true},
     password: { type: String,},
     role: { type: String, default: "user" },

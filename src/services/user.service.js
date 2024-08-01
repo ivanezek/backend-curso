@@ -12,8 +12,8 @@ class UserService{
     }
 
     async addUser(userData){
-        const { username, email, password, role } = userData;
-        const newUser = await this.userDAO.addUser(username, email, password, role);
+        const { username, first_name, last_name, age, email, password, role } = userData;
+        const newUser = await this.userDAO.addUser(username, first_name, last_name, age, email, password, role);
         return new UserDTO(newUser);
     }
 

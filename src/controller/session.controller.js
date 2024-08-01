@@ -26,8 +26,8 @@ class SessionController{
 
     static async register(req, res) {
         try{
-            const { username, email, password, role } = req.body;
-            const newUser = await UserService.addUser({ username, email, password, role });
+            const { username, first_name, last_name, age, email, password, role } = req.body;
+            const newUser = await UserService.addUser({ username, first_name, last_name, age, email, password, role });
             res.status(201).json(newUser);
         }
         catch(error){
