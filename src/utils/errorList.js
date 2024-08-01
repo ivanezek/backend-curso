@@ -20,5 +20,4 @@ const errorList = {
         message: 'Invalid input data.'
     }
 }
-
 module.exports = errorList;

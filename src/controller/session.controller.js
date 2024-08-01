@@ -28,10 +28,10 @@ class SessionController{
         try{
             const { username, email, password, role } = req.body;
             const newUser = await UserService.addUser({ username, email, password, role });
-            res.redirect("/login?message=¡Registro correcto!");
+            res.status(201).json(newUser);
         }
         catch(error){
-            res.redirect("/registerError?error=Error en registro");
+            res.status(500).json({error: error.message});
         }
     }
 

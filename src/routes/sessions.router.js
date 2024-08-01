@@ -39,4 +39,5 @@ sessionRouter.get("/registerError", SessionController.registerError);
 sessionRouter.get('/logout', SessionController.logout);
 
 
+
 module.exports = sessionRouter;
