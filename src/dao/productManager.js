@@ -23,6 +23,11 @@ const { modeloProductos } = require('./models/productos.modelo');
             throw new Error('Los campos title, price y stock son requeridos');
         }
 
+        const existingProduct = await modeloProductos.findOne({ code });
+        if (existingProduct) {
+          throw new Error('El código del producto ya existe. Por favor, elige otro código.');
+        }
+
         const newProduct = await modeloProductos.create({
             title: String(title), 
             description: description,
