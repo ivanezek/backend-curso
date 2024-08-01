@@ -30,7 +30,9 @@ sessionRouter.get("/registerError", SessionController.registerError);
   sessionRouter.get("/githubCallback", passport.authenticate("githubLogin", {failureRedirect:"api/sessions/githubError"}), SessionController.githubCallback);
 
   sessionRouter.delete("/inactive", isAdmin, SessionController.deleteUserInactive)
+  
 
+  // delete user para la vista de admin
   sessionRouter.post("/:id", isAdmin, SessionController.deleteUser)
 
   sessionRouter.post("/:id/role", isAdmin, SessionController.updateUserRole)

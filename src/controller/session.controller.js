@@ -147,7 +147,7 @@ class SessionController{
     // UPDATE USER ROLE
     static async updateUserRole(req, res) {
         const { userId, role } = req.body;
-        console.log('Received userId:', userId); // Verifica qué se recibe
+        console.log('Received userId:', userId); 
 
         try {
             if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
@@ -162,8 +162,7 @@ class SessionController{
             user.role = role;
             await user.save();
             logger.info('Rol de usuario actualizado', { userId, role });
-    
-            res.redirect("/admin");
+            res.status(200).json({ message: 'Rol de usuario actualizado' });
         } catch (error) {
             if (!res.headersSent) {
                 res.status(500).json({ error: error.message });
@@ -179,11 +178,11 @@ class SessionController{
         try{
             const user = await userModel.findById(userId);
             if (!user) {
-                throw new Error('Usuario no encontrado');
+                return res.status(404).json({ error: 'Usuario no encontrado' });
             }
 
             await userModel.deleteOne({ _id: userId });
-            res.redirect('/admin');
+            res.status(200).json({ message: 'Usuario eliminado' });
             logger.info('Usuario eliminado', { userId });
         }
         catch(error){

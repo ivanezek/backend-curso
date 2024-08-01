@@ -76,7 +76,6 @@ const { modeloProductos } = require('./models/productos.modelo');
 
   async deleteProduct(id) {
     try {
-      // Utiliza el método findOneAndDelete de Mongoose para eliminar un producto por su ID
       const deletedProduct = await modeloProductos.findOneAndDelete({ _id: id });
       if (!deletedProduct) {
         throw new Error('Producto no encontrado para eliminar');
