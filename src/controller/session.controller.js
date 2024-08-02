@@ -6,6 +6,7 @@ const { envioMail } = require('../config/mailing.config');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
+
 class SessionController{
 
     // GET USERS
@@ -23,7 +24,6 @@ class SessionController{
     static async registerError(req, res) {
         return res.status(500).json({error: "Error en registro"});
     }
-
     static async register(req, res) {
         try{
             const { username, first_name, last_name, age, email, password, role } = req.body;
@@ -54,7 +54,10 @@ class SessionController{
             if (!isPasswordValid) {
                 return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
             }
-                req.session.user = { ...user._doc };
+
+            const cartId = user.cartId;
+    
+            req.session.user = { ...user._doc, cartId };
             delete req.session.user.password;
     
             return res.status(200).json({ payload: "Login successful", user: req.session.user });
@@ -62,6 +65,7 @@ class SessionController{
             return res.status(500).json({ error: 'Error en el servidor, por favor intente más tarde.' });
         }
     }
+    
 
     // GITHUB ERROR
 

@@ -18,7 +18,8 @@ class ViewsController{
     
     // GET HOME
     static async getHome(req, res) {
-        res.status(200).render('home');
+        const cartId = req.session.user ? req.session.user.cartId : null;
+        res.status(200).render('home', { cartId });
     }
 
     // GET PRODUCTS
@@ -38,6 +39,8 @@ class ViewsController{
         } = await modeloProductos.paginate({}, { limit: 2, page: pagina, lean: true });
 
         let welcomeMessage = "";
+        let cartId = null;
+
         if (req.session.user) {
             try {
                 const user = await userManager.getUserByFilter({ username: req.session.user.username });
@@ -46,10 +49,12 @@ class ViewsController{
                 } else {
                     welcomeMessage = `Bienvenido, ${user.username}.`;
                 }
+                cartId = req.session.user.cartId;
             } catch (error) {
                 logger.error('Error al obtener información del usuario:', error);
             }
         }
+        console.log('Cart ID:', cartId);
 
         res.status(200).render('products', {
             products,
@@ -58,7 +63,8 @@ class ViewsController{
             nextPage,
             hasPrevPage,
             hasNextPage,
-            welcomeMessage
+            welcomeMessage,
+            cartId
         });
     }
 
@@ -73,7 +79,10 @@ class ViewsController{
             if (!product) {
                 return res.status(404).send('El producto no fue encontrado.');
             }
-            res.render('singleproduct', { product });
+    
+            const cartId = req.session.user ? req.session.user.cartId : null;
+    
+            res.render('singleproduct', { product, cartId });
         } catch (error) {
             logger.error('Error al obtener el producto:', error);
             res.status(500).send('Error al procesar la solicitud.');
@@ -83,25 +92,32 @@ class ViewsController{
     // GET CART BY ID
     static async getCartById(req, res) {
         try {
-            const cartId = req.params.id;
+            if (!req.session.user || !req.session.user.cartId) {
+                return res.status(403).send('No tienes un carrito asignado.');
+            }
+    
+            const cartId = req.session.user.cartId;
+    
+            if (req.session.user.role === 'admin') {
+                return res.status(403).send('No tienes permiso para tener un Carrito.');
+            }
+    
             if (!mongoose.Types.ObjectId.isValid(cartId)) {
                 return res.status(400).send('ID de carrito inválido.');
             }
-            const cart = await modeloCarts.findById(cartId).populate('products').lean();
+    
+            const cart = await modeloCarts.findById(cartId).populate('products.productId').lean();
+    
             if (!cart) {
                 return res.status(404).send('El carrito no fue encontrado.');
             }
-      
-            // Obtener los detalles de los productos basados en sus productId
-            const productsWithDetails = await Promise.all(cart.products.map(async product => {
-                const productDetails = await modeloProductos.findById(product.productId).lean();
-                return {
-                    ...product,
-                    title: productDetails.title,
-                    price: productDetails.price
-                };
+    
+            const productsWithDetails = cart.products.map(product => ({
+                ...product,
+                title: product.productId ? product.productId.title : 'Desconocido',
+                price: product.productId ? product.productId.price : 0
             }));
-      
+    
             res.render('cart', { cart: { ...cart, products: productsWithDetails } });
         } catch (error) {
             logger.error('Error al obtener el carrito:', error);
@@ -118,7 +134,9 @@ class ViewsController{
     // REGISTER VIEW
     static async getRegister(req, res) {
         let {message, error} = req.query;
-        res.status(200).render('register', {message, error});
+        const cartId = req.session.user ? req.session.user.cartId : null;
+
+        res.status(200).render('register', {message, error, cartId});
     }
 
     // PROFILE PAGE VIEW
@@ -127,7 +145,9 @@ class ViewsController{
         if (!req.session.user) {
             return res.redirect('/login');
         }
-        res.render('profile', { user: req.session.user });
+        const cartId = req.session.user ? req.session.user.cartId : null;
+
+        res.render('profile', { user: req.session.user, cartId });
     }
 
     // REALTIME PRODUCTS VIEW
