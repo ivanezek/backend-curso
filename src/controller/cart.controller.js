@@ -44,9 +44,10 @@ class CartController {
 
         try {
             const addedProduct = await CartService.addProductToCart(cartId, productId);
+            
             res.status(201).json(addedProduct);
         } catch (error) {
-            res.status(404).json({ error: error.message });
+            res.status(404).json({ error: 'No se pudo agregar el producto al carrito.' });
         }
     }
 
