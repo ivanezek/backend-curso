@@ -25,7 +25,7 @@ class UserService{
     async getUserByFilter(filter){
         const user = await this.userDAO.getUserByFilter(filter);
         if(!user){
-            throw new Error('Usuario no encontrado');
+            return null;
         }
         return new UserDTO(user);
     }

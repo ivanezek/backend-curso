@@ -5,6 +5,7 @@ const { userModel } = require('../dao/models/users.modelo');
 const { envioMail } = require('../config/mailing.config');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const userService = require('../services/user.service');
 
 
 class SessionController{
@@ -25,13 +26,16 @@ class SessionController{
         return res.status(500).json({error: "Error en registro"});
     }
     static async register(req, res) {
-        try{
+        try {
             const { username, first_name, last_name, age, email, password, role } = req.body;
-            const newUser = await UserService.addUser({ username, first_name, last_name, age, email, password, role });
+            const existingUser = await userService.getUserByFilter({ email });
+            if (existingUser) {
+                return res.status(409).json({ error: 'El usuario ya está registrado con este email.' });
+            }
+            const newUser = await userService.addUser({ username, first_name, last_name, age, email, password, role });
             res.status(201).json(newUser);
-        }
-        catch(error){
-            res.status(500).json({error: error.message});
+        } catch (error) {
+            res.status(500).json({ error: error.message });
         }
     }
 
