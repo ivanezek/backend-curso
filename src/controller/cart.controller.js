@@ -43,6 +43,10 @@ class CartController {
 
 
         try {
+            const product = await ProductService.getProductById(productId);
+            if (!product) {
+                return res.status(404).json({ error: 'Producto no encontrado' });
+            }
             const addedProduct = await CartService.addProductToCart(cartId, productId);
             
             res.status(201).json(addedProduct);
